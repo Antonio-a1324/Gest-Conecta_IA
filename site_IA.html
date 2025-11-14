@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Doulas Conecta — Apoio ao parto e maternidade</title>
+  <style>
+    :root {
+      --bg: #fffdfb;
+      --text: #2b2b2b;
+      --muted: #6b6b6b;
+      --brand: #7c3aed;      /* roxo */
+      --brand-2: #10b981;    /* verde */
+      --border: #e5e5e5;
+      --alert: #ef4444;
+    }
+    * { box-sizing: border-box }
+    body {
+      margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Noto Sans", sans-serif;
+      background: var(--bg); color: var(--text);
+    }
+    a { color: var(--brand); text-decoration: none }
+    header {
+      position: sticky; top: 0; z-index: 50;
+      background: #fff; border-bottom: 1px solid var(--border);
+    }
+    .nav {
+      max-width: 1100px; margin: 0 auto; padding: 14px 20px;
+      display: flex; align-items: center; gap: 18px;
+    }
+    .logo {
+      font-weight: 800; letter-spacing: 0.3px; color: var(--brand);
+    }
+    .nav a { padding: 8px 10px; border-radius: 8px; color: var(--text) }
+    .nav a.active { background: #f5f3ff; color: var(--brand) }
+    main { max-width: 1100px; margin: 24px auto; padding: 0 20px }
+    .grid {
+      display: grid; grid-template-columns: repeat(12, 1fr); gap: 18px;
+    }
+    .card {
+      background: #fff; border: 1px solid var(--border); border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(20,20,20,0.05);
+    }
+    h1 { font-size: 28px; margin: 10px 0 4px }
+    h2 { font-size: 22px; margin: 0 0 10px }
+    p { color: var(--muted) }
+    .btn {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--brand); color: #fff; border: none; border-radius: 10px;
+      padding: 10px 14px; cursor: pointer; font-weight: 600;
+    }
+    .btn.secondary { background: #f5f3ff; color: var(--brand) }
+    .section { margin: 26px 0 }
+    .tabs { display: flex; gap: 8px; margin-bottom: 12px; flex-wrap: wrap }
+    .tab {
+      padding: 8px 12px; border: 1px solid var(--border); border-radius: 12px; cursor: pointer;
+      background: #fff; color: var(--text);
+    }
+    .tab.active { background: #eef2ff; border-color: #c7d2fe }
+    .row { display: flex; gap: 12px; flex-wrap: wrap }
+    .field {
+      display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; flex: 1;
+    }
+    label { font-weight: 600; color: #303030; font-size: 14px }
+    input, select, textarea {
+      padding: 10px 12px; border: 1px solid var(--border); border-radius: 10px;
+      font: inherit; background: #fff;
+    }
+    textarea { min-height: 90px }
+    .hint { font-size: 12px; color: var(--muted) }
+    .list { display: grid; gap: 12px }
+    .list .item { display: flex; gap: 12px; align-items: flex-start }
+    .avatar {
+      width: 56px; height: 56px; border-radius: 50%; background: #f3e8ff; flex-shrink: 0;
+      display: grid; place-items: center; color: var(--brand); font-weight: 700;
+    }
+    .badge { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; padding: 4px 8px; border-radius: 999px; background: #ecfeff; color: #0ea5e9; border: 1px solid #c8f3ff }
+    .price { font-weight: 700; color: var(--brand-2) }
+    /* Chat */
+    .chat {
+      position: fixed; right: 18px; bottom: 18px; z-index: 60;
+      width: 320px; max-width: calc(100vw - 36px);
+    }
+    .chat-toggle {
+      width: 56px; height: 56px; border-radius: 50%; border: none; cursor: pointer;
+      background: var(--brand); color: #fff; box-shadow: 0 8px 20px rgba(124,58,237,0.35);
+      display: grid; place-items: center; font-size: 22px;
+    }
+    .chat-window {
+      display: none; background: #fff; border: 1px solid var(--border); border-radius: 14px;
+      margin-bottom: 10px; overflow: hidden; box-shadow: 0 8px 30px rgba(20,20,20,0.12);
+    }
+    .chat-header { padding: 10px 12px; background: #f5f3ff; color: var(--brand); font-weight: 700 }
+    .chat-body { max-height: 280px; overflow-y: auto; padding: 12px; display: grid; gap: 8px }
+    .msg { padding: 8px 10px; border-radius: 12px; max-width: 80% }
+    .msg.user { background: #eef2ff; margin-left: auto }
+    .msg.agent { background: #f0fdf4 }
+    .chat-input { display: flex; gap: 8px; padding: 10px; border-top: 1px solid var(--border) }
+    .chat-input input { flex: 1 }
+    /* Calendário simples */
+    .calendar {
+      width: 100%; border: 1px solid var(--border); border-radius: 12px; overflow: hidden;
+    }
+    .cal-head {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 10px 12px; background: #f9fafb; border-bottom: 1px solid var(--border);
+    }
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; border-top: 1px solid var(--border);
+    }
+    .cal-cell {
+      min-height: 80px; padding: 8px; border-right: 1px solid var(--border); border-bottom: 1px solid var(--border);
+      background: #fff; position: relative;
+    }
+    .cal-cell:nth-child(7n) { border-right: none }
+    .cal-day { font-size: 12px; color: var(--muted) }
+    .cal-event { margin-top: 6px; font-size: 12px; background: #ecfeff; color: #0369a1; padding: 4px 6px; border-radius: 6px }
+    .cal-actions { display: flex; gap: 8px }
+    .cal-actions button { padding: 6px 10px; border-radius: 8px; border: 1px solid var(--border); background: #fff; cursor: pointer }
+    /* Rodapé */
+    footer {
+      margin-top: 40px; border-top: 1px solid var(--border); background: #fff;
+    }
+    .foot { max-width: 1100px; margin: 0 auto; padding: 20px; color: var(--muted); display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px }
+    /* Responsivo */
+    @media (max-width: 900px) {
+      .grid { grid-template-columns: repeat(6, 1fr) }
+    }
+    @media (max-width: 600px) {
+      .grid { grid-template-columns: repeat(4, 1fr) }
+      .nav { padding: 10px 14px }
+      .chat { right: 12px; bottom: 12px }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Navegação -->
+  <header>
+    <nav class="nav">
+      <div class="logo">Doulas Conecta</div>
+      <a href="#home" class="active" data-route>Início</a>
+      <a href="#contratar" data-route>Contratar</a>
+      <a href="#calendario" data-route>Calendário</a>
+      <a href="#inscricao" data-route>Inscrição</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- INÍCIO -->
+    <section id="home" class="section">
+      <div class="grid">
+        <div class="card" style="grid-column: span 8">
+          <h1>Apoio contínuo na gestação, parto e pós-parto</h1>
+          <p>Conecte-se com doulas experientes em Piracicaba e região. Encontre apoio emocional, informação baseada em evidências e um plano de parto que respeita suas escolhas.</p>
+          <div class="row">
+            <button class="btn" onclick="goTo('contratar')">Encontrar doulas</button>
+            <button class="btn secondary" onclick="goTo('inscricao')">Quero me inscrever</button>
+          </div>
+        </div>
+        <div class="card" style="grid-column: span 4">
+          <h2>Por que uma doula?</h2>
+          <ul class="list">
+            <li class="item"><span class="badge">Gestação</span> Acompanhamento e preparo para o parto.</li>
+            <li class="item"><span class="badge">Parto</span> Presença contínua e técnicas de conforto.</li>
+            <li class="item"><span class="badge">Pós-parto</span> Apoio à amamentação e recuperação.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTRATAR -->
+    <section id="contratar" class="section" style="display:none">
+      <div class="grid">
+        <div class="card" style="grid-column: span 4">
+          <h2>Filtrar doulas</h2>
+          <div class="field">
+            <label>Localidade</label>
+            <select id="f-cidade">
+              <option value="">Todas</option>
+              <option value="Piracicaba">Piracicaba</option>
+              <option value="Rio Claro">Rio Claro</option>
+              <option value="Campinas">Campinas</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Faixa de preço</label>
+            <select id="f-preco">
+              <option value="">Qualquer</option>
+              <option value="1">R$ 500–1.000</option>
+              <option value="2">R$ 1.000–2.000</option>
+              <option value="3">R$ 2.000+</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Etapas atendidas</label>
+            <select id="f-etapa">
+              <option value="">Todas</option>
+              <option value="gestacao">Gestação</option>
+              <option value="parto">Parto</option>
+              <option value="pos">Pós-parto</option>
+            </select>
+          </div>
+          <button class="btn" onclick="filtrarDoulas()">Aplicar filtros</button>
+        </div>
+
+        <div class="card" style="grid-column: span 8">
+          <h2>Doulas disponíveis</h2>
+          <div id="lista-doulas" class="list"></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CALENDÁRIO -->
+    <section id="calendario" class="section" style="display:none">
+      <div class="grid">
+        <div class="card" style="grid-column: span 8">
+          <h2>Agenda de consultas e encontros</h2>
+          <div class="calendar" id="calendar">
+            <div class="cal-head">
+              <div><strong id="cal-month-name">Mês</strong></div>
+              <div class="cal-actions">
+                <button onclick="prevMonth()">Anterior</button>
+                <button onclick="nextMonth()">Próximo</button>
+              </div>
+            </div>
+            <div class="cal-grid" id="cal-grid"></div>
+          </div>
+        </div>
+        <div class="card" style="grid-column: span 4">
+          <h2>Novo evento</h2>
+          <div class="field">
+            <label>Título</label>
+            <input id="ev-title" placeholder="Ex.: Encontro pré-natal" />
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Data</label>
+              <input id="ev-date" type="date" />
+            </div>
+            <div class="field">
+              <label>Hora</label>
+              <input id="ev-time" type="time" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Descrição</label>
+            <textarea id="ev-desc" placeholder="Detalhes do encontro"></textarea>
+          </div>
+          <button class="btn" onclick="addEvent()">Adicionar ao calendário</button>
+          <p class="hint">Os eventos são salvos apenas neste navegador.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSCRIÇÃO -->
+    <section id="inscricao" class="section" style="display:none">
+      <div class="card">
+        <h2>Inscrição</h2>
+        <div class="tabs">
+          <button class="tab active" data-tab="gravida">Para gestantes</button>
+          <button class="tab" data-tab="doula">Para doulas</button>
+        </div>
+
+        <!-- Form gestante -->
+        <form id="form-gravida" class="form" onsubmit="submitForm(event, 'gravida')">
+          <div class="row">
+            <div class="field">
+              <label>Nome completo</label>
+              <input name="nome" required placeholder="Seu nome" />
+            </div>
+            <div class="field">
+              <label>E-mail</label>
+              <input name="email" type="email" required placeholder="voce@exemplo.com" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Cidade</label>
+              <input name="cidade" required placeholder="Piracicaba, SP" />
+            </div>
+            <div class="field">
+              <label>Semana de gestação</label>
+              <input name="semanas" type="number" min="1" max="42" placeholder="Ex.: 28" />
+            </div>
+          </div>
+          <div class="field">
+            <label>Preferências e necessidades</label>
+            <textarea name="preferencias" placeholder="Plano de parto, acompanhantes, dúvidas..."></textarea>
+          </div>
+          <button class="btn" type="submit">Enviar inscrição</button>
+        </form>
+
+        <!-- Form doula -->
+        <form id="form-doula" class="form" style="display:none" onsubmit="submitForm(event, 'doula')">
+          <div class="row">
+            <div class="field">
+              <label>Nome completo</label>
+              <input name="nome" required placeholder="Seu nome" />
+            </div>
+            <div class="field">
+              <label>E-mail</label>
+              <input name="email" type="email" required placeholder="voce@exemplo.com" />
+            </div>
+          </div>
+          <div class="row">
+            <div class="field">
+              <label>Cidade de atendimento</label>
+              <input name="cidade" required placeholder="Piracicaba, SP" />
+            </div>
+            <div class="field">
+              <label>Faixa de preço</label>
+              <select name="preco" required>
+                <option value="500-1000">R$ 500–1.000</option>
+                <option value="1000-2000">R$ 1.000–2.000</option>
+                <option value="2000+">R$ 2.000+</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Etapas atendidas</label>
+            <div class="row">
+              <label><input type="checkbox" name="etapas" value="Gestação"> Gestação</label>
+              <label><input type="checkbox" name="etapas" value="Parto"> Parto</label>
+              <label><input type="checkbox" name="etapas" value="Pós-parto"> Pós-parto</label>
+            </div>
+          </div>
+          <div class="field">
+            <label>Bio e certificações</label>
+            <textarea name="bio" placeholder="Formação, experiências, abordagens..."></textarea>
+          </div>
+          <button class="btn" type="submit">Enviar inscrição</button>
+        </form>
+      </div>
+    </section>
+  </main>
+
+  <!-- Chat -->
+  <div class="chat" aria-live="polite">
+    <div class="chat-window" id="chat-window">
+      <div class="chat-header">Chat — Tire suas dúvidas</div>
+      <div class="chat-body" id="chat-body">
+        <div class="msg agent">Olá! Como posso ajudar você hoje?</div>
+      </div>
+      <div class="chat-input">
+        <input id="chat-input" placeholder="Digite sua pergunta..." />
+        <button class="btn" style="padding: 8px 12px" onclick="sendMsg()">Enviar</button>
+      </div>
+    </div>
+    <button class="chat-toggle" id="chat-toggle" aria-label="Abrir chat">💬</button>
+  </div>
+
+  <footer>
+    <div class="foot">
+      <div>© 2025 Doulas Conecta</div>
+      <div>
+        <a href="#inscricao" onclick="goTo('inscricao')">Inscreva-se</a> •
+        <a href="#contratar" onclick="goTo('contratar')">Contrate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Navegação SPA simples
+    const routes = ["home", "contratar", "calendario", "inscricao"];
+    const routeLinks = document.querySelectorAll("[data-route]");
+    function goTo(id) {
+      routes.forEach(r => {
+        const el = document.getElementById(r);
+        if (el) el.style.display = r === id ? "" : "none";
+      });
+      routeLinks.forEach(a => a.classList.toggle("active", a.getAttribute("href") === "#" + id));
+      location.hash = id;
+    }
+    window.addEventListener("hashchange", () => {
+      const id = location.hash.replace("#", "") || "home";
+      if (routes.includes(id)) goTo(id);
+    });
+    // Inicialização
+    goTo(location.hash.replace("#", "") || "home");
+
+    // Dados simulados de doulas
+    const doulas = [
+      { nome: "Ana Silva", cidade: "Piracicaba", preco: 2, etapas: ["gestacao","parto","pos"], iniciais: "AS", bio: "Doula desde 2018, foco em parto humanizado.", valor: "R$ 1.500" },
+      { nome: "Bruna Costa", cidade: "Campinas", preco: 3, etapas: ["parto","pos"], iniciais: "BC", bio: "Apoio pós-parto e amamentação.", valor: "R$ 2.300" },
+      { nome: "Carla Souza", cidade: "Piracicaba", preco: 1, etapas: ["gestacao"], iniciais: "CS", bio: "Preparação para gestação e plano de parto.", valor: "R$ 900" },
+      { nome: "Débora Lima", cidade: "Rio Claro", preco: 2, etapas: ["gestacao","pos"], iniciais: "DL", bio: "Atendimento domiciliar e rodas de conversa.", valor: "R$ 1.200" },
+    ];
+
+    function renderDoulas(list) {
+      const container = document.getElementById("lista-doulas");
+      container.innerHTML = "";
+      if (!list.length) {
+        container.innerHTML = "<p>Nenhuma doula encontrada com os filtros selecionados.</p>";
+        return;
+      }
+      list.forEach(d => {
+        const el = document.createElement("div");
+        el.className = "card";
+        el.innerHTML = `
+          <div class="item">
+            <div class="avatar">${d.iniciais}</div>
+            <div style="flex:1">
+              <div style="display:flex; justify-content:space-between; align-items:center; gap:10px">
+                <strong>${d.nome}</strong>
+                <span class="price">${d.valor}</span>
+              </div>
+              <p>${d.bio}</p>
+              <div style="display:flex; gap:8px; flex-wrap:wrap; margin-top:6px">
+                <span class="badge">Cidade: ${d.cidade}</span>
+                <span class="badge">Etapas: ${d.etapas.map(e => e === 'gestacao' ? 'Gestação' : e === 'parto' ? 'Parto' : 'Pós-parto').join(', ')}</span>
+              </div>
+              <div class="row" style="margin-top:10px">
+                <button class="btn" onclick="abrirChatCom('${d.nome}')">Perguntar no chat</button>
+                <button class="btn secondary" onclick="contratar('${d.nome}')">Contratar</button>
+              </div>
+            </div>
+          </div>
+        `;
+        container.appendChild(el);
+      });
+    }
+    renderDoulas(doulas);
+
+    function filtrarDoulas() {
+      const cidade = document.getElementById("f-cidade").value;
+      const preco = document.getElementById("f-preco").value;
+      const etapa = document.getElementById("f-etapa").value;
+      const filtradas = doulas.filter(d => {
+        const okCidade = !cidade || d.cidade === cidade;
+        const okPreco = !preco || String(d.preco) === String(preco);
+        const okEtapa = !etapa || d.etapas.includes(etapa);
+        return okCidade && okPreco && okEtapa;
+      });
+      renderDoulas(filtradas);
+    }
+
+    function contratar(nome) {
+      alert(`Você está iniciando a contratação de ${nome}. Preencha seus dados na aba Inscrição.`);
+      goTo("inscricao");
+    }
+
+    // Chat
+    const chatToggle = document.getElementById("chat-toggle");
+    const chatWindow = document.getElementById("chat-window");
+    const chatBody = document.getElementById("chat-body");
+    const chatInput = document.getElementById("chat-input");
+
+    chatToggle.addEventListener("click", () => {
+      chatWindow.style.display = chatWindow.style.display === "none" || chatWindow.style.display === "" ? "block" : "none";
+      if (chatWindow.style.display === "block") chatInput.focus();
+    });
+
+    function abrirChatCom(nome) {
+      chatWindow.style.display = "block";
+      const msg = document.createElement("div");
+      msg.className = "msg agent";
+      msg.textContent = `Você selecionou ${nome}. O que gostaria de saber?`;
+      chatBody.appendChild(msg);
+      chatBody.scrollTop = chatBody.scrollHeight;
+      chatInput.focus();
+    }
+
+    function sendMsg() {
+      const text = chatInput.value.trim();
+      if (!text) return;
+      const mUser = document.createElement("div");
+      mUser.className = "msg user";
+      mUser.textContent = text;
+      chatBody.appendChild(mUser);
+      chatInput.value = "";
+      chatBody.scrollTop = chatBody.scrollHeight;
+
+      // Resposta simulada
+      setTimeout(() => {
+        const mAgent = document.createElement("div");
+        mAgent.className = "msg agent";
+        mAgent.textContent = "Obrigado pela pergunta! Em breve entraremos em contato por e-mail. Se preferir, envie seus dados na inscrição.";
+        chatBody.appendChild(mAgent);
+        chatBody.scrollTop = chatBody.scrollHeight;
+      }, 700);
+    }
+
+    // Calendário
+    const meses = ["Janeiro","Fevereiro","Março","Abril","Maio","Junho","Julho","Agosto","Setembro","Outubro","Novembro","Dezembro"];
+    let current = new Date();
+    let events = JSON.parse(localStorage.getItem("dc_events") || "[]");
+
+    function saveEvents() {
+      localStorage.setItem("dc_events", JSON.stringify(events));
+    }
+
+    function renderCalendar() {
+      const first = new Date(current.getFullYear(), current.getMonth(), 1);
+      const startDay = first.getDay(); // 0 dom — 6 sáb
+      const daysInMonth = new Date(current.getFullYear(), current.getMonth()+1, 0).getDate();
+
+      document.getElementById("cal-month-name").textContent = `${meses[current.getMonth()]} ${current.getFullYear()}`;
+
+      const grid = document.getElementById("cal-grid");
+      grid.innerHTML = "";
+
+      // Cabeçalho dos dias
+      ["Dom","Seg","Ter","Qua","Qui","Sex","Sáb"].forEach(d => {
+        const head = document.createElement("div");
+        head.className = "cal-cell";
+        head.style.background = "#f9fafb";
+        head.innerHTML = `<strong>${d}</strong>`;
+        grid.appendChild(head);
+      });
+
+      // Preencher células
+      const totalCells = startDay + daysInMonth;
+      const leading = startDay;
+      for (let i = 0; i < leading; i++) {
+        const c = document.createElement("div");
+        c.className = "cal-cell";
+        grid.appendChild(c);
+      }
+      for (let day = 1; day <= daysInMonth; day++) {
+        const dateStr = toDateStr(new Date(current.getFullYear(), current.getMonth(), day));
+        const c = document.createElement("div");
+        c.className = "cal-cell";
+        c.innerHTML = `<div class="cal-day">${day}</div>`;
+        // eventos
+        events.filter(e => e.date === dateStr).forEach(e => {
+          const badge = document.createElement("div");
+          badge.className = "cal-event";
+          badge.textContent = `${e.time || ""} ${e.title}`;
+          c.appendChild(badge);
+        });
+        grid.appendChild(c);
+      }
+    }
+
+    function toDateStr(d) {
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth()+1).padStart(2, "0");
+      const dd = String(d.getDate()).padStart(2, "0");
+      return `${yyyy}-${mm}-${dd}`;
+    }
+
+    function prevMonth() {
+      current = new Date(current.getFullYear(), current.getMonth() - 1, 1);
+      renderCalendar();
+    }
+    function nextMonth() {
+      current = new Date(current.getFullYear(), current.getMonth() + 1, 1);
+      renderCalendar();
+    }
+
+    function addEvent() {
+      const title = document.getElementById("ev-title").value.trim();
+      const date = document.getElementById("ev-date").value;
+      const time = document.getElementById("ev-time").value;
+      const desc = document.getElementById("ev-desc").value.trim();
+      if (!title || !date) {
+        alert("Informe pelo menos título e data.");
+        return;
+      }
+      events.push({ title, date, time, desc });
+      saveEvents();
+      renderCalendar();
+      document.getElementById("ev-title").value = "";
+      document.getElementById("ev-date").value = "";
+      document.getElementById("ev-time").value = "";
+      document.getElementById("ev-desc").value = "";
+    }
+
+    // Render calendário na carga
+    renderCalendar();
+
+    // Abas de inscrição
+    const tabs = document.querySelectorAll(".tab");
+    const formGravida = document.getElementById("form-gravida");
+    const formDoula = document.getElementById("form-doula");
+    tabs.forEach(t => t.addEventListener("click", () => {
+      tabs.forEach(x => x.classList.remove("active"));
+      t.classList.add("active");
+      const target = t.dataset.tab;
+      if (target === "gravida") {
+        formGravida.style.display = "";
+        formDoula.style.display = "none";
+      } else {
+        formGravida.style.display = "none";
+        formDoula.style.display = "";
+      }
+    }));
+
+    function submitForm(ev, tipo) {
+      ev.preventDefault();
+      const form = ev.target;
+      const data = Object.fromEntries(new FormData(form).entries());
+      // normaliza etapas para doula (checkbox múltiplo)
+      if (tipo === "doula") {
+        const etapas = Array.from(form.querySelectorAll('input[name="etapas"]:checked')).map(i => i.value);
+        data.etapas = etapas;
+      }
+      console.log("Inscrição enviada:", tipo, data);
+      alert(`Inscrição enviada (${tipo}). Verifique seu e-mail para próximos passos.`);
+      form.reset();
+    }
+  </script>
+</body>
+</html> 
